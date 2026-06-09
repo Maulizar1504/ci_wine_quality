@@ -13,59 +13,45 @@ env:
   F1_THRESHOLD:   "0.70"
 
 jobs:
-  # ════════════════════════════════════════════════════════
-  # STAGE 1: Code Quality
-  # ════════════════════════════════════════════════════════
   lint:
     name: "Stage 1 — Code Quality"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install linting tools
         run: pip install flake8 black isort
-
       - name: Lint with flake8
         run: |
           flake8 Membangun_model/ \
             --max-line-length=100 \
             --ignore=E501,W503,E203 \
             --exclude=__pycache__
-
       - name: Check code formatting (black)
         run: black --check --line-length=100 Membangun_model/
-
       - name: Check import order (isort)
         run: isort --check-only --profile=black Membangun_model/
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 2: Unit Tests
-  # ════════════════════════════════════════════════════════
   test:
     name: "Stage 2 — Unit Tests"
     runs-on: ubuntu-latest
     needs: lint
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: |
           pip install -r Membangun_model/requirements.txt
           pip install pytest pytest-cov
-
       - name: Run unit tests
         run: |
           pytest tests/ -v \
@@ -73,7 +59,6 @@ jobs:
             --cov-report=xml \
             --cov-report=term-missing \
             --tb=short
-
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -81,29 +66,22 @@ jobs:
           path: coverage.xml
           retention-days: 7
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 3: Data Preprocessing
-  # ════════════════════════════════════════════════════════
   preprocessing:
     name: "Stage 3 — Data Preprocessing"
     runs-on: ubuntu-latest
     needs: test
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: pip install -r Membangun_model/requirements.txt
-
       - name: Run preprocessing pipeline
         working-directory: Membangun_model
         run: python wine_quality_preprocessing.py
-
       - name: Validate preprocessing output
         working-directory: Membangun_model
         run: |
@@ -111,11 +89,9 @@ jobs:
           import joblib, numpy as np
           scaler = joblib.load('scaler.pkl')
           assert scaler.mean_.shape[0] == 16, 'Wrong number of features!'
-          print('✅ Preprocessing validation passed')
-          print(f'   Features : {scaler.mean_.shape[0]}')
-          print(f'   Mean[:3] : {np.round(scaler.mean_[:3], 4)}')
+          print('Preprocessing validation passed')
+          print(f'Features : {scaler.mean_.shape[0]}')
           "
-
       - name: Upload scaler artifact
         uses: actions/upload-artifact@v4
         with:
@@ -123,31 +99,24 @@ jobs:
           path: Membangun_model/scaler.pkl
           retention-days: 7
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 4: Model Training
-  # ════════════════════════════════════════════════════════
   train:
     name: "Stage 4 — Model Training"
     runs-on: ubuntu-latest
     needs: preprocessing
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: pip install -r Membangun_model/requirements.txt
-
       - name: Download preprocessing artifacts
         uses: actions/download-artifact@v4
         with:
           name: preprocessing-artifacts-${{ github.sha }}
           path: Membangun_model/
-
       - name: Start MLflow tracking server
         run: |
           mlflow server \
@@ -156,16 +125,13 @@ jobs:
             --backend-store-uri sqlite:///mlflow.db \
             --default-artifact-root ./mlruns &
           sleep 8
-          curl -sf http://127.0.0.1:5000/health && echo "✅ MLflow server ready"
-
+          curl -sf http://127.0.0.1:5000/health && echo "MLflow server ready"
       - name: Train baseline models
         working-directory: Membangun_model
         run: python modelling.py
-
       - name: Train with hyperparameter tuning
         working-directory: Membangun_model
         run: python modelling_tuning.py
-
       - name: Upload trained model artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -177,31 +143,24 @@ jobs:
             Membangun_model/best_tuned_info.json
           retention-days: 30
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 5: Model Evaluation & Quality Gate
-  # ════════════════════════════════════════════════════════
   evaluate:
     name: "Stage 5 — Evaluation & Quality Gate"
     runs-on: ubuntu-latest
     needs: train
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-
       - name: Install dependencies
         run: pip install -r Membangun_model/requirements.txt
-
       - name: Download model artifacts
         uses: actions/download-artifact@v4
         with:
           name: model-artifacts-${{ github.sha }}
           path: Membangun_model/
-
       - name: Run quality gate check
         working-directory: Membangun_model
         env:
@@ -211,48 +170,27 @@ jobs:
           import json, os, sys
           with open('best_tuned_info.json') as f:
               info = json.load(f)
-
           f1        = info['test_f1']
           threshold = float(os.environ['F1_THRESHOLD'])
-          model     = info['model_name']
-
-          print(f'Model      : {model}')
-          print(f'Test F1    : {f1:.4f}')
-          print(f'Threshold  : {threshold}')
-
+          print(f'Model     : {info[\"model_name\"]}')
+          print(f'Test F1   : {f1:.4f}')
+          print(f'Threshold : {threshold}')
           if f1 < threshold:
-              print(f'❌ QUALITY GATE FAILED: F1 {f1:.4f} < {threshold}')
+              print(f'QUALITY GATE FAILED: F1 {f1:.4f} < {threshold}')
               sys.exit(1)
-          print(f'✅ QUALITY GATE PASSED: F1 {f1:.4f} >= {threshold}')
+          print(f'QUALITY GATE PASSED: F1 {f1:.4f} >= {threshold}')
           "
-
-      - name: Generate evaluation report
-        working-directory: Membangun_model
-        run: |
-          python -c "
-          import json
-          with open('best_tuned_info.json') as f:
-              info = json.load(f)
-          report = f'''
-          ## Model Evaluation Report
-          | Metric | Value |
-          |--------|-------|
-          | Best Model | {info['model_name']} |
-          | Test F1    | {info['test_f1']:.4f} |
-          | Quality Gate | {'PASSED ✅' if info['quality_gate_passed'] else 'FAILED ❌'} |
-          '''
-          with open('eval_report.md', 'w') as f:
-              f.write(report)
-          print(report)
-          "
-
       - name: Write to step summary
         run: |
-          cat Membangun_model/eval_report.md >> $GITHUB_STEP_SUMMARY
+          echo "## Model Evaluation" >> $GITHUB_STEP_SUMMARY
+          python -c "
+          import json
+          with open('Membangun_model/best_tuned_info.json') as f:
+              info = json.load(f)
+          print(f'| Model | {info[\"model_name\"]} |')
+          print(f'| Test F1 | {info[\"test_f1\"]:.4f} |')
+          " >> $GITHUB_STEP_SUMMARY
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 6: Upload Artifacts to GitHub
-  # ════════════════════════════════════════════════════════
   upload:
     name: "Stage 6 — Upload to GitHub"
     runs-on: ubuntu-latest
@@ -260,57 +198,45 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-
       - name: Download model artifacts
         uses: actions/download-artifact@v4
         with:
           name: model-artifacts-${{ github.sha }}
           path: release-artifacts/
-
       - name: Create release archive
         run: |
           DATE=$(date +%Y%m%d_%H%M)
-          SHA="${{ github.sha }}"
-          zip -r "wine_quality_model_${DATE}_${SHA:0:7}.zip" release-artifacts/
+          zip -r "wine_quality_model_${DATE}.zip" release-artifacts/
           ls -lh *.zip
-
       - name: Upload release archive to GitHub
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ github.sha }}
           path: "*.zip"
           retention-days: 90
-
-      - name: Upload to DagsHub (if token configured)
-        if: secrets.DAGSHUB_TOKEN != ''
+      - name: Upload to DagsHub
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
-          SHORT_SHA: ${{ github.sha }}
+          GIT_SHA: ${{ github.sha }}
         run: |
           pip install dagshub mlflow scikit-learn joblib pandas numpy
-          SHORT=${SHORT_SHA:0:7}
           python - <<PYEOF
           import dagshub, mlflow, os
-
           dagshub.init(
               repo_owner='alsyamaulizar',
               repo_name='wine-quality-ml',
               mlflow=True
           )
-          short_sha = os.environ.get('SHORT_SHA', 'unknown')[:7]
-          with mlflow.start_run(run_name=f'CI_{short_sha}'):
+          sha = os.environ.get('GIT_SHA', 'unknown')[:7]
+          with mlflow.start_run(run_name=f'CI_{sha}'):
               mlflow.log_artifact('release-artifacts/best_tuned_model.pkl')
               mlflow.log_artifact('release-artifacts/scaler.pkl')
               mlflow.log_artifact('release-artifacts/best_tuned_info.json')
               mlflow.set_tag('ci_run', 'true')
-              mlflow.set_tag('git_sha', os.environ.get('SHORT_SHA', ''))
-              mlflow.set_tag('branch',  '${{ github.ref_name }}')
+              mlflow.set_tag('git_sha', os.environ.get('GIT_SHA', ''))
           print('Artifacts uploaded to DagsHub')
           PYEOF
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 7: Build & Test Docker Image
-  # ════════════════════════════════════════════════════════
   docker:
     name: "Stage 7 — Build & Test Docker"
     runs-on: ubuntu-latest
@@ -318,47 +244,28 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-
       - name: Download model artifacts
         uses: actions/download-artifact@v4
         with:
           name: model-artifacts-${{ github.sha }}
           path: Membangun_model/
-
       - name: Build Docker image
-        run: |
-          docker build \
-            -t wine-quality-inference:${{ github.sha }} \
-            -t wine-quality-inference:latest \
-            .
-
+        run: docker build -t wine-quality-inference:latest .
       - name: Test Docker container health
         run: |
-          docker run -d \
-            -p 5001:5001 \
-            --name test-container \
+          docker run -d -p 5001:5001 --name test-container \
             -v $PWD/Membangun_model/scaler.pkl:/app/scaler.pkl \
             -v $PWD/Membangun_model/best_tuned_model.pkl:/app/best_tuned_model.pkl \
             wine-quality-inference:latest
           sleep 10
-          curl -sf http://localhost:5001/health && echo "✅ Container healthy"
-          docker stop test-container
-          docker rm   test-container
-
+          curl -sf http://localhost:5001/health && echo "Container healthy"
+          docker stop test-container && docker rm test-container
       - name: Push to GitHub Container Registry
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | \
-            docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker tag wine-quality-inference:latest \
-            ghcr.io/${{ github.repository }}/wine-quality-inference:latest
-          docker tag wine-quality-inference:${{ github.sha }} \
-            ghcr.io/${{ github.repository }}/wine-quality-inference:${{ github.sha }}
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker tag wine-quality-inference:latest ghcr.io/${{ github.repository }}/wine-quality-inference:latest
           docker push ghcr.io/${{ github.repository }}/wine-quality-inference:latest
-          docker push ghcr.io/${{ github.repository }}/wine-quality-inference:${{ github.sha }}
 
-  # ════════════════════════════════════════════════════════
-  # STAGE 8: Final Summary
-  # ════════════════════════════════════════════════════════
   summary:
     name: "Stage 8 — Pipeline Summary"
     runs-on: ubuntu-latest
@@ -367,8 +274,7 @@ jobs:
     steps:
       - name: Write pipeline summary
         run: |
-          echo "## 🍷 Wine Quality ML — CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Wine Quality ML — CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Code Quality  | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
@@ -378,7 +284,5 @@ jobs:
           echo "| Evaluation    | ${{ needs.evaluate.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Upload        | ${{ needs.upload.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Docker        | ${{ needs.docker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Python:** ${{ env.PYTHON_VERSION }}" >> $GITHUB_STEP_SUMMARY
