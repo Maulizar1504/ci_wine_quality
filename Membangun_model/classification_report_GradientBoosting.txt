@@ -1,0 +1,10 @@
+Model: GradientBoosting
+
+              precision    recall  f1-score   support
+
+         Bad       0.92      0.97      0.95       277
+        Good       0.70      0.49      0.58        43
+
+    accuracy                           0.90       320
+   macro avg       0.81      0.73      0.76       320
+weighted avg       0.89      0.90      0.90       320

@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1780964365337
+current_stage: None
+description: null
+last_updated_timestamp: 1780964365337
+name: WineQuality_GradientBoosting_Tuned
+run_id: b739eb625fb349e8983579d0f990ca51
+run_link: null
+source: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/b739eb625fb349e8983579d0f990ca51/artifacts/GradientBoosting_Tuned
+status: READY
+status_message: null
+storage_location: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/b739eb625fb349e8983579d0f990ca51/artifacts/GradientBoosting_Tuned
+user_id: null
+version: 3

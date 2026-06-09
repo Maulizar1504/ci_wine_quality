@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/c98a0df2bcaf46fc880a16e35d70cbd4/artifacts
+end_time: 1780921582852
+entry_point_name: ''
+experiment_id: '880999357377644064'
+lifecycle_stage: active
+run_id: c98a0df2bcaf46fc880a16e35d70cbd4
+run_name: GradientBoosting_Tuned
+run_uuid: c98a0df2bcaf46fc880a16e35d70cbd4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780921403340
+status: 3
+tags: []
+user_id: alsyamaulizar

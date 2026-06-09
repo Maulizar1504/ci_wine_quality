@@ -1,0 +1,18 @@
+{
+  "model_name": "RandomForest_Tuned",
+  "test_f1": 0.7631578947368421,
+  "run_id": "74eef32898384d608a9157f605f09810",
+  "all_results": {
+    "RandomForest_Tuned": {
+      "test_f1": 0.7631578947368421,
+      "test_auc": 0.9479892536310972,
+      "run_id": "74eef32898384d608a9157f605f09810"
+    },
+    "GradientBoosting_Tuned": {
+      "test_f1": 0.7272727272727273,
+      "test_auc": 0.9378725547812946,
+      "run_id": "b739eb625fb349e8983579d0f990ca51"
+    }
+  },
+  "quality_gate_passed": true
+}

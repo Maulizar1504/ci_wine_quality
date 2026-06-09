@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/5877dbe4b1da4a44a758f6b03d9c176d/artifacts
+end_time: 1780964365626
+entry_point_name: ''
+experiment_id: '880999357377644064'
+lifecycle_stage: active
+run_id: 5877dbe4b1da4a44a758f6b03d9c176d
+run_name: best_tuned_artifacts
+run_uuid: 5877dbe4b1da4a44a758f6b03d9c176d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1780964365529
+status: 3
+tags: []
+user_id: alsyamaulizar

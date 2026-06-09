@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1780963222034
+current_stage: None
+description: null
+last_updated_timestamp: 1780963222034
+name: WineQuality_RandomForest_Tuned
+run_id: 6f14c536e8424a69a2499cc7422f8c50
+run_link: null
+source: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/6f14c536e8424a69a2499cc7422f8c50/artifacts/RandomForest_Tuned
+status: READY
+status_message: null
+storage_location: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064/6f14c536e8424a69a2499cc7422f8c50/artifacts/RandomForest_Tuned
+user_id: null
+version: 2

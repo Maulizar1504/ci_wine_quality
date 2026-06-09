@@ -1,0 +1,6 @@
+artifact_location: file:///D:/pijak/ci_wine_quality/Membangun_model/mlruns/880999357377644064
+creation_time: 1780921299303
+experiment_id: '880999357377644064'
+last_update_time: 1780921299303
+lifecycle_stage: active
+name: wine_quality_tuning

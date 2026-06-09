@@ -1,0 +1,11 @@
+Model: RandomForest_Tuned
+Best Params: {'n_estimators': 300, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': None, 'bootstrap': False}
+
+              precision    recall  f1-score   support
+
+         Bad       0.95      0.99      0.97       277
+        Good       0.88      0.67      0.76        43
+
+    accuracy                           0.94       320
+   macro avg       0.92      0.83      0.87       320
+weighted avg       0.94      0.94      0.94       320

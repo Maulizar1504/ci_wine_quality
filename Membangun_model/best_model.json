@@ -1,0 +1,19 @@
+{
+  "best_model": "RandomForest",
+  "f1": 0.676056338028169,
+  "run_id": "3d3346ed5bfa4b34b1cd4f58ffc3f4d2",
+  "all_results": {
+    "LogisticRegression": {
+      "f1": 0.4375,
+      "run_id": "4fcf6562cf7240b6b7850beecba3099a"
+    },
+    "RandomForest": {
+      "f1": 0.676056338028169,
+      "run_id": "3d3346ed5bfa4b34b1cd4f58ffc3f4d2"
+    },
+    "GradientBoosting": {
+      "f1": 0.5753424657534246,
+      "run_id": "9c9257d7e50248e78a3acb49c70e6dbd"
+    }
+  }
+}

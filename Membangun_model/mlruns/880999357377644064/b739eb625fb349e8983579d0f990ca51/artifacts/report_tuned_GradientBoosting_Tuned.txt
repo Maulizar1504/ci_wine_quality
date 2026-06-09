@@ -1,0 +1,11 @@
+Model: GradientBoosting_Tuned
+Best Params: {'subsample': 0.9, 'n_estimators': 100, 'min_samples_split': 10, 'min_samples_leaf': 4, 'max_depth': 9, 'learning_rate': 0.1}
+
+              precision    recall  f1-score   support
+
+         Bad       0.95      0.98      0.96       277
+        Good       0.82      0.65      0.73        43
+
+    accuracy                           0.93       320
+   macro avg       0.89      0.81      0.84       320
+weighted avg       0.93      0.93      0.93       320
