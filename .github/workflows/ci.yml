@@ -285,9 +285,11 @@ jobs:
         if: secrets.DAGSHUB_TOKEN != ''
         env:
           DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          SHORT_SHA: ${{ github.sha }}
         run: |
           pip install dagshub mlflow scikit-learn joblib pandas numpy
-          python - <<'PYEOF'
+          SHORT=${SHORT_SHA:0:7}
+          python - <<PYEOF
           import dagshub, mlflow, os
 
           dagshub.init(
@@ -295,14 +297,15 @@ jobs:
               repo_name='wine-quality-ml',
               mlflow=True
           )
-          with mlflow.start_run(run_name='CI_${{ github.sha[:7] }}'):
+          short_sha = os.environ.get('SHORT_SHA', 'unknown')[:7]
+          with mlflow.start_run(run_name=f'CI_{short_sha}'):
               mlflow.log_artifact('release-artifacts/best_tuned_model.pkl')
               mlflow.log_artifact('release-artifacts/scaler.pkl')
               mlflow.log_artifact('release-artifacts/best_tuned_info.json')
               mlflow.set_tag('ci_run', 'true')
-              mlflow.set_tag('git_sha', '${{ github.sha }}')
+              mlflow.set_tag('git_sha', os.environ.get('SHORT_SHA', ''))
               mlflow.set_tag('branch',  '${{ github.ref_name }}')
-          print('✅ Artifacts uploaded to DagsHub')
+          print('Artifacts uploaded to DagsHub')
           PYEOF
 
   # ════════════════════════════════════════════════════════
