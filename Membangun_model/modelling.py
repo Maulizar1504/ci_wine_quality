@@ -86,7 +86,8 @@ if __name__ == "__main__":
     mlflow.set_experiment(EXPERIMENT)
     print("Memuat data...")
     df = load_data()
-    X_train, X_val, X_test, y_train, y_val, y_test, scaler = preprocess(df)
+# Ubah baris ini jika fungsi preprocess hanya mengembalikan 6 variabel (tanpa scaler di akhir)
+X_train, X_val, X_test, y_train, y_val, y_test = preprocess(df)
     daftar_model = {
         "LogisticRegression": LogisticRegression(C=1.0, max_iter=1000, random_state=42),
         "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
