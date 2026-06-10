@@ -53,7 +53,6 @@ def simpan_roc_curve(model, X_test, y_test, nama_model):
     plt.close()
     return path
 
-
 def latih_dan_log(model, nama_model, X_train, X_val, X_test, y_train, y_val, y_test):
     with mlflow.start_run(run_name=nama_model) as run:
         model.fit(X_train, y_train)
@@ -97,8 +96,8 @@ daftar_model = {
     "Random Forest": RandomForestClassifier(random_state=42),
     "Gradient Boosting": GradientBoostingClassifier(random_state=42)
 }
-    print("\nHasil pelatihan:")
-    hasil = {}
+print("\nHasil pelatihan:")
+hasil = {}
     for nama, model in daftar_model.items():
         f1, run_id, trained_model = latih_dan_log(
             model, nama, X_train, X_val, X_test, y_train, y_val, y_test
@@ -113,5 +112,5 @@ daftar_model = {
         mlflow.log_artifact("scaler.pkl")
         mlflow.log_artifact("best_model.pkl")
         mlflow.log_artifact("best_model.json")
-    print(f"\nModel terbaik: {terbaik} | F1={hasil[terbaik]['f1']}")
-    print("best_model.pkl tersimpan!")
+print(f"\nModel terbaik: {terbaik} | F1={hasil[terbaik]['f1']}")
+print("best_model.pkl tersimpan!")
