@@ -86,8 +86,13 @@ if __name__ == "__main__":
     mlflow.set_experiment(EXPERIMENT)
     print("Memuat data...")
     df = load_data()
-# Ubah baris ini jika fungsi preprocess hanya mengembalikan 6 variabel (tanpa scaler di akhir)
+# Tangkap 6 variabel hasil split data saja
 X_train, X_val, X_test, y_train, y_val, y_test = preprocess(df)
+
+# Karena scaler sudah disimpan otomatis oleh preprocess ke './scaler.pkl', 
+# jika code di bawah baris ini membutuhkan variabel `scaler`, load manual seperti ini:
+import joblib
+scaler = joblib.load("./scaler.pkl")
     daftar_model = {
         "LogisticRegression": LogisticRegression(C=1.0, max_iter=1000, random_state=42),
         "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
