@@ -93,11 +93,10 @@ X_train, X_val, X_test, y_train, y_val, y_test = preprocess(df)
 # jika code di bawah baris ini membutuhkan variabel `scaler`, load manual seperti ini:
 import joblib
 scaler = joblib.load("./scaler.pkl")
-    daftar_model = {
-        "LogisticRegression": LogisticRegression(C=1.0, max_iter=1000, random_state=42),
-        "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
-        "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
-    }
+daftar_model = {
+    "Random Forest": RandomForestClassifier(random_state=42),
+    "Gradient Boosting": GradientBoostingClassifier(random_state=42)
+}
     print("\nHasil pelatihan:")
     hasil = {}
     for nama, model in daftar_model.items():
